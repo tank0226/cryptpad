@@ -101,7 +101,6 @@ define([
     };
 
     var mkThemeButton = function (framework) {
-        Messages.toolbar_theme = "Theme"; // XXX
         var $theme = $(h('button.cp-toolbar-appmenu', [
             h('i.cptools.cptools-palette'),
             h('span.cp-button-name', Messages.toolbar_theme)
@@ -109,29 +108,10 @@ define([
         var $content = $(h('div.cp-toolbar-drawer-content', {
             tabindex: 1
         })).hide();
-        $theme.click(function () {
-            $content.toggle();
-            $theme.removeClass('cp-toolbar-button-active');
-            if ($content.is(':visible')) {
-                $theme.addClass('cp-toolbar-button-active');
-                $content.focus();
-                var wh = $(window).height();
-                var topPos = $theme[0].getBoundingClientRect().bottom;
-                $content.css('max-height', Math.floor(wh - topPos - 1)+'px');
-            }
-        });
-        var onBlur = function (e) {
-            if (e.relatedTarget) {
-                if ($(e.relatedTarget).is('.cp-toolbar-drawer-button')) { return; }
-                if ($(e.relatedTarget).parents('.cp-toolbar-drawer-content').length) {
-                    $(e.relatedTarget).blur(onBlur);
-                    return;
-                }
-            }
-            $theme.removeClass('cp-toolbar-button-active');
-            $content.hide();
-        };
-        $content.blur(onBlur).appendTo($theme);
+
+        // set up all the necessary events
+        UI.createDrawer($theme, $content);
+
         framework._.toolbar.$theme = $content;
         framework._.toolbar.$bottomL.append($theme);
     };
@@ -377,7 +357,6 @@ define([
             framework.localChange();
         };
 
-        Messages.slide_backCol = "Background color"; // XXX
         var $back = framework._.sfCommon.createButton(null, true, {
             icon: 'fa-square',
             text: Messages.slide_backCol,
@@ -386,7 +365,6 @@ define([
             name: 'background',
             id: SLIDE_BACKCOLOR_ID
         });
-        Messages.slide_textCol = "Text color"; // XXX
         var $text = framework._.sfCommon.createButton(null, true, {
             icon: 'fa-i-cursor',
             text: Messages.slide_textCol,
@@ -498,7 +476,10 @@ define([
         mkColorConfiguration(framework, $modal);
         mkFilePicker(framework, editor);
         mkSlidePreviewPane(framework, $contentContainer);
-        mkHelpMenu(framework);
+
+        if (!privateData.isEmbed) {
+            mkHelpMenu(framework);
+        }
 
         CodeMirror.mkIndentSettings(framework._.cpNfInner.metadataMgr);
         CodeMirror.init(framework.localChange, framework._.title, framework._.toolbar);

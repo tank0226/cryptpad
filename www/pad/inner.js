@@ -533,7 +533,9 @@ define([
             }
         };
 
-        mkHelpMenu(framework);
+        if (!privateData.isEmbed) {
+            mkHelpMenu(framework);
+        }
 
         framework._.sfCommon.getAttribute(['pad', 'width'], function(err, data) {
             var active = data || typeof(data) === "undefined";
@@ -791,8 +793,8 @@ define([
             });
         }, true);
 
-        framework.setFileExporter(Exporter.ext, function(cb) {
-            Exporter.main(inner, cb);
+        framework.setFileExporter(Exporter.exts, function(cb, ext) {
+            Exporter.main(inner, cb, ext);
         }, true);
 
         framework.setNormalizer(function(hjson) {
@@ -995,6 +997,7 @@ define([
                     }
                     return _getPath(name);
                 };
+                window.__defineGetter__('_cke_htmlToLoad', function() {});
                 editor.plugins.mediatag.import = function($mt) {
                     framework._.sfCommon.importMediaTag($mt);
                 };

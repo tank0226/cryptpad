@@ -310,7 +310,10 @@ define([
             $canvasContainer.find('canvas').css('border-color', bool? 'black': 'red');
         };
 
-        mkHelpMenu(framework);
+        var privateData = metadataMgr.getPrivateData();
+        if (!privateData.isEmbed) {
+            mkHelpMenu(framework);
+        }
 
         mkControls(framework, canvas);
 
@@ -391,7 +394,6 @@ define([
                 });
             }).appendTo($drawer);
         } else {
-            Messages.toolbar_insert = "Insert"; // XXX duplicate key from common-ui-elements
             framework._.sfCommon.createButton('', true, {
                 title: Messages.canvas_imageEmbed,
                 text: Messages.toolbar_insert,

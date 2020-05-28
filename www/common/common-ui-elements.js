@@ -1510,7 +1510,7 @@ define([
                 break;
             case 'present':
                 button = $(h('button', {
-                    title: Messages.presentButtonTitle, // XXX remove tippy?
+                    //title: Messages.presentButtonTitle, // TODO display if the label text is collapsed
                 }, [
                     h('i.fa.fa-play-circle'),
                     h('span.cp-toolbar-name', Messages.share_linkPresent)
@@ -1518,7 +1518,7 @@ define([
                 break;
             case 'preview':
                 button = $(h('button', {
-                    title: Messages.previewButtonTitle, // XXX remove tippy?
+                    //title: Messages.previewButtonTitle, // TODO display if the label text is collapsed
                 }, [
                     h('i.fa.fa-eye'),
                     h('span.cp-toolbar-name', Messages.share_linkOpen)
@@ -1555,16 +1555,14 @@ define([
                 }
                 break;
             case 'mediatag':
-                Messages.toolbar_insert = "Insert"; // XXX
                 button = $(h('button.cp-toolbar-mediatag', {
-                    title: Messages.filePickerButton, // XXX remove tippy?
+                    //title: Messages.filePickerButton, // TODO display if the label text is collapsed
                 }, [
                     h('i.fa.fa-picture-o'),
                     h('span.cp-toolbar-name', Messages.toolbar_insert)
                 ])).click(common.prepareFeedback(type));
                 break;
             case 'savetodrive':
-                Messages.toolbar_savetodrive = "Save as image"; // XXX
                 button = $(h('button.cp-toolbar-savetodrive', {
                     title: Messages.canvas_saveToDrive,
                 }, [
@@ -1588,9 +1586,8 @@ define([
                 });
                 break;
             case 'toggle':
-                Messages.toolbar_tools = "Tools"; // XXX
                 button = $(h('button.cp-toolbar-tools', {
-                    title: data.title || '', // XXX remove tippy?
+                    //title: data.title || '', // TODO display if the label text is collapsed
                 }, [
                     h('i.fa.fa-wrench'),
                     h('span.cp-toolbar-name', Messages.toolbar_tools)
@@ -1661,7 +1658,7 @@ define([
                 var drawerCls = data.drawer === false ? '' : '.cp-toolbar-drawer-element';
                 var icon = data.icon || "fa-question";
                 button = $(h('button', {
-                    title: data.title || '', // XXX remove tippy?
+                    //title: data.title || '',
                 }, [
                     h('i.fa.' + icon),
                     h('span.cp-toolbar-name'+drawerCls, data.text)
@@ -2144,8 +2141,17 @@ define([
 
         var show = function () {
             var wh = $(window).height();
-            var topPos = $container[0].getBoundingClientRect().bottom;
-            $innerblock.css('max-height', Math.floor(wh - topPos - 1)+'px');
+            var button = $button[0].getBoundingClientRect();
+            var topPos = button.bottom;
+            $innerblock.css('bottom', '');
+            if (config.noscroll) {
+                var h = $innerblock.outerHeight();
+                if ((topPos + h) > wh) {
+                    $innerblock.css('bottom', button.height+'px');
+                }
+            } else {
+                $innerblock.css('max-height', Math.floor(wh - topPos - 1)+'px');
+            }
             $innerblock.show();
             $innerblock.find('.cp-dropdown-element-active').removeClass('cp-dropdown-element-active');
             if (config.isSelect && value) {
@@ -2160,6 +2166,11 @@ define([
             e.stopPropagation();
             var state = $innerblock.is(':visible');
             $('.cp-dropdown-content').hide();
+
+            var $c = $container.closest('.cp-toolbar-drawer-content');
+            $c.removeClass('cp-dropdown-visible');
+            if (!state) { $c.addClass('cp-dropdown-visible'); }
+
             try {
                 $('iframe').each(function (idx, ifrw) {
                     $(ifrw).contents().find('.cp-dropdown-content').hide();
